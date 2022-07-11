@@ -521,6 +521,7 @@ def get_map_json(request, **kwargs):
     data_result = {}
 
     measureParam = kwargs.get("measure", None)
+    cityParam = request.GET.get("city", None)
     selectedMeasure = None
     measurements = Measurement.objects.all()
 
@@ -529,7 +530,12 @@ def get_map_json(request, **kwargs):
     elif measurements.count() > 0:
         selectedMeasure = measurements[0]
 
-    locations = Location.objects.all()
+    # Filter by city if provided
+    if cityParam:
+        locations = Location.objects.filter(city__name=cityParam)
+    else:
+        locations = Location.objects.all()
+    
     try:
         start = datetime.fromtimestamp(
             float(request.GET.get("from", None)) / 1000
